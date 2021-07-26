@@ -1,0 +1,7 @@
+# select what technology your build uses
+use: [ go@1 ]
+# which commands to run to build
+run:
+  - go build -o server cmd/main.go
+# which files / folders to deploy after build
+deploy: [ server ]
