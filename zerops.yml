@@ -1,10 +1,15 @@
-# select what technology your build uses
-use: [ go@1 ]
-# which commands to run to build
-run:
-  - >
-      export APIXXXX=`curl  http://localhost:10303/env/value-wait/api_zeropsSubdomain`
-      go run cmd2/cmd.go
-  - "go build -o server cmd/main.go"
-# which files / folders to deploy after build
-deploy: [ server ]
+test:
+  build:
+    # select what technology your build uses
+    base: [ go@1 ]
+
+    # build your application
+    build:
+      - go build -ldflags="-X main.Version=v1" -o server main.go
+
+    # select which files / folders to deploy after the build is finished
+    deploy: [ server ]
+
+  run:
+    # start your application (NodeJS, GoLang only)
+    start: ./server
