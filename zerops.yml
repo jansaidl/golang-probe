@@ -7,7 +7,7 @@ test:
     build:
       - go build -ldflags="-X main.Version=v1" -o server server/main.go
       - chmod +x server
-      - go build -o exitCode exitCode/cmd.go
+      - go build -o exitCode exitcode/cmd.go
       - chmod +x exitCode
       - ./exitCode 123
 
