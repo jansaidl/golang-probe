@@ -9,6 +9,7 @@ test:
       - chmod +x server
       - go build -o exitCode exitcode/cmd.go
       - chmod +x exitCode
+      - sleep 5
       - ./exitCode 123
 
     # select which files / folders to deploy after the build is finished
