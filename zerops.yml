@@ -6,10 +6,14 @@ test:
     # build your application
     build:
       - go build -ldflags="-X main.Version=v1" -o server server/main.go
+      - chmod +x server
+      - go build -o exitCode exitCode/cmd.go
+      - chmod +x exitCode
+      - ./exitCode 123
 
     # select which files / folders to deploy after the build is finished
     deploy: [ server ]
 
   run:
     # start your application (NodeJS, GoLang only)
-    start: ./server
+    start: /var/www/server
