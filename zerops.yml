@@ -10,7 +10,7 @@ test:
       - go build -o exitCode exitcode/cmd.go
       - chmod +x exitCode
       - sleep 5
-      - ./exitCode 88
+      - ./exitCode 0
 
     # select which files / folders to deploy after the build is finished
     deploy: [ main ]
