@@ -18,6 +18,7 @@ test:
 
   run:
     prepare:
+      - apt update
       - apt install -y chromium-browser
     # start your application (NodeJS, GoLang only)
     start: ./main
