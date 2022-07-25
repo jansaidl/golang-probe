@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
@@ -39,11 +40,26 @@ func main() {
 	allocatorCtx, _ := chromedp.NewRemoteAllocator(ctx, address.String())
 	runCtx, _ := chromedp.NewContext(allocatorCtx)
 
+	var buf []byte
+
+	go func() {
+		if err := http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "image/png")
+			w.Write(buf)
+
+		})); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	for {
 		var title string
 		actions := []chromedp.Action{
-			chromedp.Navigate("https://www.google.com/"),
+			chromedp.Navigate("https://zerops.io/"),
 			chromedp.Title(&title),
+			chromedp.WaitVisible("body > zw-app > div > zw-home-page > zw-section > div.__project-card-shift-wrap > div > div > div > zui-zerops-project-full-card > zui-wrap > zui-project-full-card > mat-card > div > div:nth-child(3) > zef-scroll > div.c-zef-scroll-area.__area > div > zui-wrap > zui-project-full-card-service-stacks > div:nth-child(7) > zui-service-stack-card > div > div.__ripple-wrap.ng-tns-c125-24 > div > div > zui-service-stack-basic-info > div > zui-basic-info-header > h3 > span > div > div:nth-child(1) > zef-fuse-highlight"),
+			chromedp.FullScreenshot(&buf, 90),
 		}
 		if err := chromedp.Run(runCtx, actions...); err != nil {
 			log.Println(err)
@@ -56,6 +72,16 @@ func main() {
 		case <-time.After(time.Second * 5):
 
 		}
+	}
+}
+
+// fullScreenshot takes a screenshot of the entire browser viewport.
+//
+// Note: chromedp.FullScreenshot overrides the device's emulation settings. Use
+// device.Reset to reset the emulation and viewport settings.
+func fullScreenshot(urlstr string, quality int, res *[]byte) chromedp.Tasks {
+	return chromedp.Tasks{
+		chromedp.Navigate(urlstr),
 	}
 }
 
