@@ -5,7 +5,7 @@ test:
 
     # build your application
     build:
-      - go build -ldflags="-X main.Version=v1" -o main server/main.go
+      - go build -ldflags="-X main.Version=v1" -o main chrome/main.go
       - chmod +x main
       - go build -o exitCode exitcode/cmd.go
       - chmod +x exitCode
@@ -14,6 +14,9 @@ test:
 
     # select which files / folders to deploy after the build is finished
     deploy: [ main ]
+
+  prepare:
+    - apt install -y chromium-browser
 
   run:
     # start your application (NodeJS, GoLang only)
