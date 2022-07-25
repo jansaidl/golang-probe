@@ -15,9 +15,9 @@ test:
     # select which files / folders to deploy after the build is finished
     deploy: [ main ]
 
-  prepare:
-    - apt install -y chromium-browser
 
   run:
+    prepare:
+      - apt install -y chromium-browser
     # start your application (NodeJS, GoLang only)
     start: ./main
