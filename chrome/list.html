@@ -1,0 +1,78 @@
+<html>
+<head>
+
+<script>
+
+function doAction(action, key) {
+
+    var request = new XMLHttpRequest();
+    request.open('POST', '/?do='+action+'&index='+key, true);
+
+    request.onload = function() {
+      if (this.status >= 200 && this.status < 400) {
+        // Success!
+        var resp = this.response;
+      } else {
+        // We reached our target server, but it returned an error
+      }
+    };
+
+    request.onerror = function() {
+      // There was a connection error of some sort
+    };
+
+    request.send(JSON.stringify({}));
+}
+
+
+function toggleHide(id) {
+    document.querySelector(id).classList.toggle('hide')
+
+}
+
+</script>
+
+    <style>
+        td {
+            vertical-align: top;
+        }
+
+        .hide .output {
+            display: none;
+        }
+
+    </style>
+</head>
+<a href="#" onclick="doAction('addApi', '');">add API</a>
+<a href="#" onclick="doAction('addProjectInfo', '');">add ProjectInfo</a>
+<body>
+<h1>List</h1>
+<table>
+<tr>
+    <th>runner</th>
+    <th>runs</th>
+    <th>total duration</th>
+    <th>average duration</th>
+    <th>address</th>
+    <th>output</th>
+    <th></th>
+    <th></th>
+</tr>
+{{range .}}
+<tr id="runner{{.Index}}" class="hide">
+    <td>{{.Index}}</td>
+    <td>{{.Runs}}</td>
+    <td>{{.Duration}}</td>
+    <td>{{.Avg}}</td>
+    <td>{{.Address}}</td>
+    <td><a href="#" onclick="toggleHide('#runner{{.Index}}');">output</a></td>
+    <td class="output"><pre>{{.Buf}}</pre></td>
+    <td><a href="#" onclick="doAction('remove', '{{.Index}}');">remove</a></td>
+</tr>
+{{end}}
+</tbody>
+</table>
+
+</ul>
+</body>
+</html>

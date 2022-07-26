@@ -1,26 +1,84 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"context"
-	"errors"
+	_ "embed"
 	"fmt"
+	"html/template"
+	"io"
 	"log"
+	"math/rand"
 	"net/http"
-	"net/url"
 	"os"
-	"os/exec"
 	"os/signal"
-	"strings"
-	"sync"
+	"strconv"
 	"syscall"
+	"time"
 
-	"github.com/chromedp/chromedp"
+	"github.com/rakyll/hey/requester"
 )
+
+type worker struct {
+	Address  string
+	Index    string
+	Buf      string
+	Runs     int64
+	Duration time.Duration
+	Avg      time.Duration
+	Cancel   context.CancelFunc
+}
+
+//go:embed list.html
+var list string
+var listTemplate *template.Template
+
+func init() {
+	listTemplate = template.Must(template.New("").Parse(list))
+}
+
+func (w *worker) stop() {
+	w.Cancel()
+}
+
+func (w *worker) run(ctx context.Context) {
+	cancelCtx, cancel := context.WithCancel(ctx)
+	w.Cancel = cancel
+
+	for {
+		w.Runs++
+		start := time.Now()
+		result := bytes.NewBuffer(nil)
+		hey(ctx, mustRequest(http.NewRequest("GET", w.Address, nil)), result)
+		w.Buf = result.String()
+		w.Duration += time.Since(start)
+		if w.Runs > 0 {
+			w.Avg = time.Duration(int64(w.Duration) / w.Runs)
+		}
+		select {
+		case <-cancelCtx.Done():
+			return
+		default:
+			//case <-time.After(time.Second * 5):
+		}
+
+	}
+}
+
+func mustRequest(r *http.Request, err error) *http.Request {
+	if err != nil {
+		panic(err)
+	}
+	return r
+}
+
+var workers []*worker
 
 func main() {
 	log.Println("starting")
 	ctx, cancel := context.WithCancel(context.Background())
+
+	rand.Seed(time.Now().Unix())
 
 	go func() {
 		interrupt := make(chan os.Signal, 1)
@@ -29,125 +87,92 @@ func main() {
 		cancel()
 	}()
 
-	address, err := chrome(ctx)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	fmt.Sprintf(address.String())
-	log.Printf("Address: %s", address.String())
-
-	var buf []byte
-
 	go func() {
 		if err := http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "image/png")
-			w.Write(buf)
-
+			action := r.URL.Query().Get("do")
+			switch action {
+			case "addProjectInfo":
+				addProjectInfo(ctx)
+				return
+			case "addApi":
+				addApi(ctx)
+				return
+			case "remove":
+				index := r.URL.Query().Get("index")
+				for heyIndex, heyWorker := range workers {
+					if heyWorker.Index == index {
+						workers = append(workers[0:heyIndex], workers[heyIndex+1:]...)
+						heyWorker.stop()
+						fmt.Println("remove index: ", index)
+						break
+					}
+				}
+			}
+			listTemplate.Execute(w, workers)
+			return
 		})); err != nil {
 			log.Fatal(err)
 		}
 	}()
 
-	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func(ctx context.Context, i int) {
-			defer wg.Done()
-			for {
-				fmt.Println(i)
-				allocatorCtx, _ := chromedp.NewRemoteAllocator(ctx, address.String())
-				xCtx, _ := chromedp.NewContext(allocatorCtx)
-				var title string
-				actions := []chromedp.Action{
-					chromedp.Navigate("https://zerops.io/"),
-					chromedp.Title(&title),
-					chromedp.WaitVisible("body > zw-app > div > zw-home-page > zw-section > div.__project-card-shift-wrap > div > div > div > zui-zerops-project-full-card > zui-wrap > zui-project-full-card > mat-card > div > div:nth-child(3) > zef-scroll > div.c-zef-scroll-area.__area > div > zui-wrap > zui-project-full-card-service-stacks > div:nth-child(7) > zui-service-stack-card > div > div.__ripple-wrap.ng-tns-c125-24 > div > div > zui-service-stack-basic-info > div > zui-basic-info-header > h3 > span > div > div:nth-child(1) > zef-fuse-highlight"),
-				}
-				if i == 9 {
-					actions = append(actions, chromedp.FullScreenshot(&buf, 90))
-				}
-
-				if err := chromedp.Run(xCtx, actions...); err != nil {
-					log.Println(err)
-					return
-				}
-				//		log.Println(title)
-				select {
-				case <-ctx.Done():
-					return
-				default:
-					//case <-time.After(time.Second * 5):
-
-				}
-			}
-		}(ctx, i)
+	for i := 0; i < 1; i++ {
+		addProjectInfo(ctx)
+		addProjectInfo(ctx)
+		addProjectInfo(ctx)
+		addProjectInfo(ctx)
+		addProjectInfo(ctx)
+		addApi(ctx)
+		addApi(ctx)
+		addApi(ctx)
+		addApi(ctx)
+		addApi(ctx)
 	}
 
-	wg.Wait()
+	<-ctx.Done()
 
 }
 
-func chrome(ctx context.Context) (*url.URL, error) {
-	cmd := exec.CommandContext(ctx, "/usr/bin/chromium-browser", "--no-sandbox", "--disable-gpu", "--headless", "--remote-debugging-port=9222")
-	stderrPipe, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, err
+func addProjectInfo(ctx context.Context) {
+	chromWorker := newWorker("https://web-api.zerops.io/api/articles")
+	workers = append(workers, chromWorker)
+	go chromWorker.run(ctx)
+
+}
+
+func addApi(ctx context.Context) {
+	chromWorker := newWorker("https://zerops.io/projectinfo")
+	workers = append(workers, chromWorker)
+	go chromWorker.run(ctx)
+}
+
+func newWorker(address string) *worker {
+	return &worker{
+		Address: address,
+		Index:   strconv.Itoa(rand.Int()),
 	}
-	scanner := bufio.NewScanner(stderrPipe)
+}
 
-	scanned := make(chan bool)
-	defer close(scanned)
-
-	done := make(chan struct{})
+func hey(ctx context.Context, req *http.Request, writer io.Writer) {
+	w := &requester.Work{
+		Request:            req,
+		RequestBody:        nil,
+		N:                  500,
+		C:                  10,
+		QPS:                0,
+		Timeout:            20,
+		DisableCompression: true,
+		DisableKeepAlives:  true,
+		DisableRedirects:   true,
+		H2:                 false,
+		ProxyAddr:          nil,
+		Output:             "",
+		Writer:             writer,
+	}
+	w.Init()
 	go func() {
-		defer close(done)
-		if err := cmd.Start(); err != nil {
-			log.Printf("%v (%s)", err, "start command error")
-			return
-		}
-		ok := <-scanned
-		var err error
-		if ok {
-			err = cmd.Process.Release()
-		} else {
-			err = cmd.Process.Kill()
-		}
-		if err != nil {
-			log.Println(err)
-		}
+		<-ctx.Done()
+		w.Stop()
 	}()
+	w.Run()
 
-	var addr *url.URL
-	err = errors.New("address not found")
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" {
-			continue
-		}
-		if strings.HasPrefix(line, "DevTools listening on ") {
-			line := strings.TrimPrefix(line, "DevTools listening on ")
-			addr, err = url.Parse(line)
-			if err != nil {
-				err = fmt.Errorf("%v: invalid address: %s", err, line)
-				log.Printf("%v (%s)", err, "start command error")
-				return nil, err
-			}
-			err = nil
-			break
-		}
-	}
-	if err != nil || scanner.Err() != nil {
-		scanned <- false
-		<-done
-		if scanner.Err() != nil {
-			log.Println(err)
-		}
-		return nil, err
-	}
-	scanned <- true
-
-	return addr, nil
 }
