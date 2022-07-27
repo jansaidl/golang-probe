@@ -101,6 +101,8 @@ func main() {
 					counter++
 					fmt.Println(counter)
 				}
+				fmt.Fprintf(w, "%d", counter)
+				return
 
 			case "addProjectInfo":
 				addProjectInfo(ctx)
