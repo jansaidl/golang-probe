@@ -110,6 +110,9 @@ func main() {
 			case "addApi":
 				addApi(ctx)
 				return
+			case "addGui":
+				addGui(ctx)
+				return
 			case "remove":
 				index := r.URL.Query().Get("index")
 				for heyIndex, heyWorker := range workers {
@@ -139,6 +142,11 @@ func main() {
 		addApi(ctx)
 		addApi(ctx)
 		addApi(ctx)
+		addGui(ctx)
+		addGui(ctx)
+		addGui(ctx)
+		addGui(ctx)
+		addGui(ctx)
 	}
 
 	<-ctx.Done()
@@ -154,6 +162,12 @@ func addProjectInfo(ctx context.Context) {
 
 func addApi(ctx context.Context) {
 	chromWorker := newWorker("https://zerops.io/projectinfo")
+	workers = append(workers, chromWorker)
+	go chromWorker.run(ctx)
+}
+
+func addGui(ctx context.Context) {
+	chromWorker := newWorker("https://zerops.io/")
 	workers = append(workers, chromWorker)
 	go chromWorker.run(ctx)
 }
