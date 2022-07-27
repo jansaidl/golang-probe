@@ -76,6 +76,7 @@ var workers []*worker
 
 func main() {
 	log.Println("starting")
+	var counter uint64
 	ctx, cancel := context.WithCancel(context.Background())
 
 	rand.Seed(time.Now().Unix())
@@ -91,6 +92,9 @@ func main() {
 		if err := http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			action := r.URL.Query().Get("do")
 			switch action {
+			case "echo":
+				fmt.Println(counter)
+				counter++
 			case "addProjectInfo":
 				addProjectInfo(ctx)
 				return
