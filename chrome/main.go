@@ -93,8 +93,15 @@ func main() {
 			action := r.URL.Query().Get("do")
 			switch action {
 			case "echo":
-				fmt.Println(counter)
-				counter++
+				delta, err := strconv.Atoi(r.URL.Query().Get("index"))
+				if err != nil {
+					delta = 1
+				}
+				for i := 0; i < delta; i++ {
+					counter++
+					fmt.Println(counter)
+				}
+
 			case "addProjectInfo":
 				addProjectInfo(ctx)
 				return
