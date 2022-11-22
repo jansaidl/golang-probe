@@ -134,17 +134,8 @@ func main() {
 	for i := 0; i < 1; i++ {
 		addProjectInfo(ctx)
 		addProjectInfo(ctx)
-		addProjectInfo(ctx)
-		addProjectInfo(ctx)
-		addProjectInfo(ctx)
 		addApi(ctx)
 		addApi(ctx)
-		addApi(ctx)
-		addApi(ctx)
-		addApi(ctx)
-		addGui(ctx)
-		addGui(ctx)
-		addGui(ctx)
 		addGui(ctx)
 		addGui(ctx)
 	}
