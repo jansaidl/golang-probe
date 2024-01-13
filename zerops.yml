@@ -1,21 +1,8 @@
-test:
+api:
   build:
-    # select what technology your build uses
     base: [ go@1 ]
-
-    # build your application
     build:
-      - go build -ldflags="-X main.Version=v1" -o main chrome/main.go
-      - chmod +x main
-      - go build -o exitCode exitcode/cmd.go
-      - chmod +x exitCode
-      - sleep 5
-      - ./exitCode 0
-
-    # select which files / folders to deploy after the build is finished
+      - go build -o main server/main.go
     deploy: [ main ]
-
-
   run:
-    # start your application (NodeJS, GoLang only)
     start: ./main
