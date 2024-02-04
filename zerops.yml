@@ -4,5 +4,6 @@ api:
     build:
       - go build -o main server/main.go
     deploy: [ main ]
+    cache: [ main ]
   run:
     start: ./main
