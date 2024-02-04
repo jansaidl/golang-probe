@@ -6,4 +6,6 @@ api:
     deploy: [ main ]
     cache: [ main ]
   run:
+    prepare:
+    - echo "aaaa"
     start: ./main
