@@ -34,7 +34,7 @@ func main() {
 			fmt.Fprintf(w, "Hello j %d / %d;o)\n\n", i, j)
 
 			fmt.Fprintf(w, "\n------\n\n")
-			printDir(w, "/tmp/sharedstorage0")
+			printDir(w, "/mnt/sharedstorage0")
 			fmt.Fprintf(w, "\n------\n\n")
 
 			for _, e := range os.Environ() {
