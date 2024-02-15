@@ -1,12 +1,22 @@
-zerops:
-- setup: api
+api:
   build:
     base: [ go@1 ]
-    buildCommands:
+    build:
       - go build -o main server/main.go
     deploy: [ main ]
     cache: [ main ]
   run:
-    prepareCommands:
+    prepare:
+    - echo "aaaa"
+    start: ./main
+api2:
+  build:
+    base: [ go@1 ]
+    build:
+      - go build -o main server/main.go
+    deploy: [ main ]
+    cache: [ main ]
+  run:
+    prepare:
     - echo "aaaa"
     start: ./main
