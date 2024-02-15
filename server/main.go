@@ -34,7 +34,7 @@ func main() {
 			fmt.Fprintf(w, "Hello j %d / %d;o)\n\n", i, j)
 
 			fmt.Fprintf(w, "\n------\n\n")
-			printDir(w, "/mnt/sharedstorage0")
+			printDir(w, "/mnt", "")
 			fmt.Fprintf(w, "\n------\n\n")
 
 			for _, e := range os.Environ() {
@@ -57,7 +57,7 @@ func main() {
 	fmt.Println("finished")
 }
 
-func printDir(w io.Writer, dirName string) {
+func printDir(w io.Writer, dirName string, prefix string) {
 	dir, err := os.ReadDir(dirName)
 	if err != nil {
 		fmt.Fprintf(w, "%s: err: %s\n ", dirName, err.Error())
@@ -66,13 +66,14 @@ func printDir(w io.Writer, dirName string) {
 	for _, d := range dir {
 		i, err := os.Stat(path.Join(dirName, d.Name()))
 		if err != nil {
-			fmt.Fprintf(w, "%s: %s\n ", d.Name(), err.Error())
+			fmt.Fprintf(w, "%s%s: %s\n ", prefix, d.Name(), err.Error())
 			continue
 		}
 		if d.IsDir() {
-			fmt.Fprintf(w, "%s dir\n ", d.Name())
+			fmt.Fprintf(w, "%s%s dir\n ", prefix, d.Name())
+			printDir(w, path.Join(dirName, d.Name()), prefix+" ")
 		} else {
-			fmt.Fprintf(w, "%s %d\n ", d.Name(), i.Size())
+			fmt.Fprintf(w, "%s%s %d\n ", prefix, d.Name(), i.Size())
 		}
 	}
 	return
