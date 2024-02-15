@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
-	"io"
-	"path"
 	"os/signal"
+	"path"
 	"sync/atomic"
 	"syscall"
 )
@@ -33,13 +33,14 @@ func main() {
 			w.Header().Add("Content-type", "text/plain")
 			fmt.Fprintf(w, "Hello j %d / %d;o)\n\n", i, j)
 
+			fmt.Fprintf(w, "\n------\n\n")
 			printDir(w, "/tmp/sharedstorage0")
-			
+			fmt.Fprintf(w, "\n------\n\n")
+
 			for _, e := range os.Environ() {
 				fmt.Fprintf(w, "%s\n", e)
 			}
 
-			
 		}))
 	}()
 
@@ -56,23 +57,23 @@ func main() {
 	fmt.Println("finished")
 }
 
-func printDir(writer io.Writer, dirName string) {
+func printDir(w io.Writer, dirName string) {
 	dir, err := os.ReadDir(dirName)
 	if err != nil {
-
+		fmt.Fprintf(w, "%s: err: %s\n ", dirName, err.Error())
+		return
 	}
 	for _, d := range dir {
 		i, err := os.Stat(path.Join(dirName, d.Name()))
 		if err != nil {
-			fmt.Fprintf(writer, "%s: %s\n ", d.Name(), err.Error())
+			fmt.Fprintf(w, "%s: %s\n ", d.Name(), err.Error())
 			continue
 		}
 		if d.IsDir() {
-			fmt.Fprintf(writer, "%s dir\n ", d.Name())
+			fmt.Fprintf(w, "%s dir\n ", d.Name())
 		} else {
-			fmt.Fprintf(writer, "%s %d\n ", d.Name(), i.Size())
+			fmt.Fprintf(w, "%s %d\n ", d.Name(), i.Size())
 		}
 	}
 	return
 }
-
