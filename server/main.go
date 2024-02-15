@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"io"
+	"path"
 	"os/signal"
 	"sync/atomic"
 	"syscall"
@@ -30,9 +32,14 @@ func main() {
 			atomic.AddUint64(&j, 1)
 			w.Header().Add("Content-type", "text/plain")
 			fmt.Fprintf(w, "Hello j %d / %d;o)\n\n", i, j)
+
+			printDir(w, "/tmp/sharedstorage0")
+			
 			for _, e := range os.Environ() {
 				fmt.Fprintf(w, "%s\n", e)
 			}
+
+			
 		}))
 	}()
 
@@ -48,3 +55,24 @@ func main() {
 	<-ctx.Done()
 	fmt.Println("finished")
 }
+
+func printDir(writer io.Writer, dirName string) {
+	dir, err := os.ReadDir(dirName)
+	if err != nil {
+
+	}
+	for _, d := range dir {
+		i, err := os.Stat(path.Join(dirName, d.Name()))
+		if err != nil {
+			fmt.Fprintf(writer, "%s: %s\n ", d.Name(), err.Error())
+			continue
+		}
+		if d.IsDir() {
+			fmt.Fprintf(writer, "%s dir\n ", d.Name())
+		} else {
+			fmt.Fprintf(writer, "%s %d\n ", d.Name(), i.Size())
+		}
+	}
+	return
+}
+
