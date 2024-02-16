@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
+	"crypto/md5"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
 	"path"
 	"sync/atomic"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -32,6 +35,27 @@ func main() {
 			atomic.AddUint64(&j, 1)
 			w.Header().Add("Content-type", "text/plain")
 			fmt.Fprintf(w, "Hello j %d / %d;o)\n\n", i, j)
+
+			if r.URL.Query().Get("action") == "write" {
+				d := r.URL.Query().Get("dir")
+
+				f, err := os.Create(path.Join(d, fmt.Sprintf("file_%d", time.Now().Unix())))
+				if err != nil {
+					fmt.Fprintf(w, "err: %s\n", err.Error())
+
+				} else {
+					defer f.Close()
+					m := md5.New()
+					r := rand.New(rand.NewSource(time.Now().UnixMicro()))
+					for i := 0; i < 1000; i++ {
+						f.Write(m.Sum([]byte(fmt.Sprintf("aaaaa%d", r.Uint32()))))
+					}
+				}
+
+				fmt.Fprintf(w, "\n------\n\n")
+				printDir(w, d, "")
+
+			}
 
 			fmt.Fprintf(w, "\n------\n\n")
 			printDir(w, "/mnt", "")
