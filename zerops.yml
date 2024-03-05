@@ -2,8 +2,6 @@ zerops:
   - setup: api
     build:
       base: go@1
-      prepareCommands:
-        - npm install -g typescript
       buildCommands:
         - go build -o main server/main.go
       deploy:
