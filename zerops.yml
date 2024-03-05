@@ -1,22 +1,13 @@
-api:
-  build:
-    base: [ go@1 ]
+zerops:
+  - setup: api
     build:
-      - go build -o main server/main.go
-    deploy: [ main ]
-    cache: [ main ]
-  run:
-    prepare:
-    - echo "aaaa"
-    start: ./main
-api2:
-  build:
-    base: [ go@1 ]
-    build:
-      - go build -o main server/main.go
-    deploy: [ main ]
-    cache: [ main ]
-  run:
-    prepare:
-    - echo "aaaa"
-    start: ./main
+      base: go@1
+      prepareCommands:
+        - npm install -g typescript
+      buildCommands:
+        - go build -o main server/main.go
+      deploy:
+        - main
+    run:
+      start: ./main
+
