@@ -12,6 +12,6 @@ zerops:
       os: alpine@3.18
       base: go@1
       prepareCommands:
-      - echo "aaaa"
+      - echo "aaaa $ZEROPS_RUN_OS / $ZEROPS_RUN_BASE"
       start: ./main
 
