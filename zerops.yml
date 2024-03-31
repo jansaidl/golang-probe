@@ -1,5 +1,7 @@
 zerops:
   - setup: api
+    envVariables:
+      Hello: World
     build:
       base: go@1
       buildCommands:
