@@ -7,5 +7,7 @@ zerops:
       deploy:
         - main
     run:
+      os: alpine@3.18
+      base: go@1
       start: ./main
 
