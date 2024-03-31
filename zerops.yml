@@ -11,5 +11,7 @@ zerops:
     run:
       os: alpine@3.18
       base: go@1
+      prepareCommands:
+      - echo "aaaa"
       start: ./main
 
