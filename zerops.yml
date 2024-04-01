@@ -9,9 +9,9 @@ zerops:
       deploy:
         - main
     run:
-      os: ubuntu_jammy_runtime_nodejs_16_1
+      os: ubuntu_jammy_prepare_nodejs_16_1
       base: go@1
       prepareCommands:
-      - echo "aaaa $ZEROPS_RUN_OS / $ZEROPS_RUN_BASE" xxxyyyzzz
+      - echo "aaaa $ZEROPS_RUN_OS / $ZEROPS_RUN_BASE" xxxyyyzzzeee
       start: ./main
 
