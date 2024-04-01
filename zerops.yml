@@ -12,6 +12,6 @@ zerops:
       os: ubuntu_jammy_runtime_nodejs_16_1
       base: go@1
       prepareCommands:
-      - echo "aaaa $ZEROPS_RUN_OS / $ZEROPS_RUN_BASE" xxx
+      - echo "aaaa $ZEROPS_RUN_OS / $ZEROPS_RUN_BASE" xxxyyy
       start: ./main
 
