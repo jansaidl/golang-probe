@@ -10,7 +10,7 @@ zerops:
         - main
     run:
       os: ubuntu
-      base: node@18
+      base: nodejs@18
 #      prepareCommands:
 #     - echo "aaaa $ZEROPS_RUN_OS / $ZEROPS_RUN_BASE" xxxyyyzzzeee
       start: ./main
