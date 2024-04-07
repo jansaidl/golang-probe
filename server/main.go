@@ -36,6 +36,8 @@ func main() {
 			w.Header().Add("Content-type", "text/plain")
 			fmt.Fprintf(w, "Hello j %d / %d;o)\n\n", i, j)
 
+			fmt.Fprintf(w, "RemoteAddr: %s\n\n", r.RemoteAddr)
+
 			if r.URL.Query().Get("action") == "write" {
 				d := r.URL.Query().Get("dir")
 
