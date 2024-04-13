@@ -1,5 +1,5 @@
 zerops:
-  - setup: apibuild
+  - setup: api
     build:
       base: go@1
       buildCommands:
