@@ -1,5 +1,5 @@
 zerops:
-  - setup: api
+  - setup: apibuild
     build:
       base: go@1
       buildCommands:
@@ -8,4 +8,9 @@ zerops:
         - main
     run:
       start: ./main
+
+  - setup: api
+    run:
+      start: zsc noop 
+
 
