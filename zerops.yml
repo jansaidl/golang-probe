@@ -9,4 +9,6 @@ zerops:
     run:
       os: ubuntu
       base: nodejs@18
+      prepareCommands:
+      - echo "aaaa" > /root/aaaa
       start: zsc noop 
