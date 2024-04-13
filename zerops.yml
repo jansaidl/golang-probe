@@ -10,10 +10,3 @@ zerops:
       os: ubuntu
       base: nodejs@18
       start: zsc noop 
-
-  - setup: api
-    run:
-      os: ubuntu
-      base: nodejs@18
-      start: zsc noop 
-
