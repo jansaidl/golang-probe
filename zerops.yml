@@ -1,7 +1,5 @@
 zerops:
-  - setup: api
-    envVariables:
-      Hello: World
+  - setup: apibuild
     build:
       base: go@1
       buildCommands:
@@ -11,7 +9,11 @@ zerops:
     run:
       os: ubuntu
       base: nodejs@18
-#      prepareCommands:
-#     - echo "aaaa $ZEROPS_RUN_OS / $ZEROPS_RUN_BASE" xxxyyyzzzeee
-      start: ./main
+      start: zsc noop 
+
+  - setup: api
+    run:
+      os: ubuntu
+      base: nodejs@18
+      start: zsc noop 
 
