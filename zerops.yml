@@ -11,4 +11,5 @@ zerops:
       base: nodejs@18
       prepareCommands:
       - echo "aaaa" > /root/aaaa
+      - zsc noop
       start: zsc noop 
