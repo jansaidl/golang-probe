@@ -1,4 +1,13 @@
 zerops:
+  - setup: test2
+    build:
+      base: go@1
+      buildCommands:
+        - go build -o main server/main.go
+      deploy:
+        - main
+    run:
+      start: ./main
   - setup: apibuild
     build:
       base: go@1
