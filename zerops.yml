@@ -3,6 +3,7 @@ zerops:
     build:
       base: go@1
       buildCommands:
+        - zsc noop
         - go build -o main server/main.go
       deploy:
         - main
