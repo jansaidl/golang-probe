@@ -8,7 +8,7 @@ zerops:
         - main
     run:
       os: ubuntu
-      base: nodejs@18
+      base: go@1
       prepareCommands:
       - echo "aaaa" > /root/aaaa
       #- zsc noop
