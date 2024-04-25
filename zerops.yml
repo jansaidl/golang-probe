@@ -1,4 +1,16 @@
 zerops:
+  - setup: nginx
+    build:
+      base: go@1
+      buildCommands:
+        - go build -o main server/main.go
+      deploy:
+        - main
+    run:
+      prepareCommands:
+      - echo "aaaa" > /root/aaaa
+      #- zsc noop
+      start: zsc noop 
   - setup: api
     build:
       base: go@1
