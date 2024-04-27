@@ -1,4 +1,23 @@
 zerops:
+  - setup: nginx
+    build:
+      base: go@1
+      buildCommands:
+        - go build -o main backend/main.go
+      deploy:
+        - main
+        - nginx/nginx.conf
+        - nginx/default
+    run:
+      prepareCommands:
+        - apt update && apt install nginx
+      initCommands:
+        - rm /etc/nginx/sites-enabled/default
+        - rm /etc/nginx/nginx.conf
+        - ln -s nginx/nginx.conf /etc/nginx/nginx.conf
+        - ln -s nginx/default /etc/nginx/sites-enabled/default
+        - service nginx restart
+      start: ./main
   - setup: backend
     build:
       base: go@1
