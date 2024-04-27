@@ -1,4 +1,13 @@
 zerops:
+  - setup: backend
+    build:
+      base: go@1
+      buildCommands:
+        - go build -o main backend/main.go
+      deploy:
+        - main
+    run:
+      start: ./main
   - setup: test2
     build:
       base: go@1
