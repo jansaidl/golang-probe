@@ -11,6 +11,7 @@ zerops:
     run:
       prepareCommands:
         - apt update && apt -y install nginx
+        - wget -O hey https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64 && chmod +x hey
       initCommands:
         - rm /etc/nginx/sites-enabled/default
         - rm /etc/nginx/nginx.conf
@@ -26,6 +27,19 @@ zerops:
       deploy:
         - main
     run:
+      prepareCommands:
+        - wget -O hey https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64 && chmod +x hey
+      start: ./main
+  - setup: hey
+    build:
+      base: go@1
+      buildCommands:
+        - go build -o main backend/main.go
+      deploy:
+        - main
+    run:
+      prepareCommands:
+        - wget -O hey https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64 && chmod +x hey
       start: ./main
   - setup: test2
     build:
