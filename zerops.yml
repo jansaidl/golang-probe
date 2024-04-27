@@ -10,7 +10,7 @@ zerops:
         - nginx/default
     run:
       prepareCommands:
-        - apt update && apt install nginx
+        - apt update && apt -y install nginx
       initCommands:
         - rm /etc/nginx/sites-enabled/default
         - rm /etc/nginx/nginx.conf
