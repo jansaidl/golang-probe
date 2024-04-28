@@ -8,6 +8,7 @@ zerops:
         - main
         - nginx/nginx.conf
         - nginx/default
+        - nginx/index.html
     run:
       prepareCommands:
         - apt update && apt -y install nginx
@@ -17,6 +18,7 @@ zerops:
         - rm /etc/nginx/nginx.conf
         - ln -s /var/www/nginx/nginx.conf /etc/nginx/nginx.conf
         - ln -s /var/www/nginx/default /etc/nginx/sites-enabled/default
+        - ln -s /var/www/nginx/index.html /var/www/html/index.html
         - service nginx restart
       start: ./main
   - setup: backend
@@ -45,7 +47,6 @@ zerops:
     build:
       base: go@1
       buildCommands:
-        - zsc noop
         - go build -o main server/main.go
       deploy:
         - main
@@ -60,8 +61,11 @@ zerops:
         - main
     run:
       start: ./main
-
   - setup: api
+    build:
+      base: go@1
+      buildCommands:
+        - go build -o main server/main.go
     run:
       start: zsc noop 
 

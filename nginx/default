@@ -11,3 +11,16 @@ server {
 	}
 }
 
+server {
+	listen 8082;
+	listen [::]:8082;
+
+	root /var/www/html;
+
+	server_name _;
+
+	location / {
+		try_files $uri $uri/ /index.html;
+	}
+}
+
