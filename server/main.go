@@ -32,6 +32,11 @@ func main() {
 	}()
 	go func() {
 		http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			for k, hs := range r.Header {
+				fmt.Fprintf(w, "Header[%q] = %q\n", k, hs)
+			}
+
 			atomic.AddUint64(&j, 1)
 			w.Header().Add("Content-type", "text/plain")
 			fmt.Fprintf(w, "Hello j %d / %d;o)\n\n", i, j)
